@@ -3,6 +3,7 @@ module github.com/d-ashesss/whisper-service
 go 1.20
 
 require (
+	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
 	golang.org/x/sync v0.2.0
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0

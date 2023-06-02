@@ -12,11 +12,13 @@ import (
 )
 
 type App struct {
+	config *Config
 	server *grpc.Server
 }
 
-func NewApp(server *grpc.Server) *App {
+func NewApp(config *Config, server *grpc.Server) *App {
 	return &App{
+		config: config,
 		server: server,
 	}
 }
@@ -29,11 +31,13 @@ func (a *App) Run() {
 	wg, gCtx := errgroup.WithContext(signalCtx)
 
 	wg.Go(func() error {
-		lis, err := net.Listen("tcp", ":10000")
+		addr := ":" + a.config.Port
+		lis, err := net.Listen("tcp", addr)
 		if err != nil {
-			log.Print("[app] Unable to open socket:", err)
+			log.Printf("[app] Unable to start listener at %q: %s", addr, err)
 			return err
 		}
+		log.Printf("[app] Starting gRPC server at %q", addr)
 		if err := a.server.Serve(lis); err != nil {
 			log.Print("[app] gRPC server has stopped unexpectedly: ", err)
 			return err

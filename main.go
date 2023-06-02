@@ -6,8 +6,9 @@ import (
 )
 
 func main() {
+	cfg := NewConfig()
 	srv := grpc.NewServer()
 	whisperpb.RegisterWhisperServiceServer(srv, &WhisperServiceServer{})
-	app := NewApp(srv)
+	app := NewApp(cfg, srv)
 	app.Run()
 }

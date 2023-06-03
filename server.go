@@ -19,6 +19,9 @@ func (WhisperServiceServer) Transcribe(s whisperpb.WhisperService_TranscribeServ
 	_, file, err := recvTranscribe(s)
 	if err != nil {
 		log.Printf("[whisper.transcribe] ERROR: Failed to receive or save the file: %s", err)
+		if _, ok := status.FromError(err); ok {
+			return err
+		}
 		return status.Errorf(codes.Unavailable, "unable to receive the file")
 	}
 	defer func(name string) {
@@ -47,10 +50,16 @@ func recvTranscribe(stream whisperpb.WhisperService_TranscribeServer) (*whisperp
 		if err != nil {
 			return nil, nil, fmt.Errorf("read chunk: %w", err)
 		}
-		if _, err := file.Write(req.GetChunk()); err != nil {
+		if r.GetChunk() == nil {
+			return nil, nil, status.Errorf(codes.InvalidArgument, "invalid request input")
+		}
+		if _, err := file.Write(r.GetChunk()); err != nil {
 			return nil, nil, fmt.Errorf("write chunk: %w", err)
 		}
 		req = r
+	}
+	if req == nil {
+		return nil, nil, status.Errorf(codes.InvalidArgument, "invalid request input")
 	}
 	req.Chunk = nil
 	return req, file, nil

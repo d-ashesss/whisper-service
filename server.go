@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	whisperpb "github.com/d-ashesss/whisper-service/proto"
+	"github.com/d-ashesss/whisper-service/whisper"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
@@ -12,11 +13,16 @@ import (
 
 type WhisperServiceServer struct {
 	whisperpb.UnimplementedWhisperServiceServer
+	service whisper.Service
 }
 
-func (WhisperServiceServer) Transcribe(s whisperpb.WhisperService_TranscribeServer) error {
+func NewServer(srv whisper.Service) *WhisperServiceServer {
+	return &WhisperServiceServer{service: srv}
+}
+
+func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_TranscribeServer) error {
 	log.Printf("[whisper.transcribe] Received transcription request")
-	_, file, err := recvTranscribe(s)
+	_, file, err := recvTranscribe(stream)
 	if err != nil {
 		log.Printf("[whisper.transcribe] ERROR: Failed to receive or save the file: %s", err)
 		if _, ok := status.FromError(err); ok {
@@ -29,12 +35,23 @@ func (WhisperServiceServer) Transcribe(s whisperpb.WhisperService_TranscribeServ
 			log.Printf("[whisper.transcribe] ERROR: Failed to delete tmp file: %s", err)
 		}
 	}(file.Name())
-	log.Printf("[whisper.transcribe] Created tmp file %s", file.Name())
-	return status.Errorf(codes.Unimplemented, "method Transcribe not implemented")
+
+	transcript, err := s.service.Transcribe(stream.Context(), file.Name())
+	if err != nil {
+		log.Printf("[whisper.transcribe] ERROR: Transcription failed: %s", err)
+		return status.Errorf(codes.Internal, "transcription failed")
+	}
+	r := &whisperpb.TranscribeResponse{Transcription: transcript}
+	if err := stream.SendAndClose(r); err != nil {
+		log.Printf("[whisper.transcribe] ERROR: Failed to respond: %s", err)
+		return err
+	}
+	log.Printf("[whisper.transcribe] Transcription completed")
+	return nil
 }
 
 func recvTranscribe(stream whisperpb.WhisperService_TranscribeServer) (*whisperpb.TranscribeRequest, *os.File, error) {
-	file, err := os.CreateTemp("", "")
+	file, err := os.CreateTemp("", "*.tmp")
 	if err != nil {
 		return nil, nil, fmt.Errorf("create file: %w", err)
 	}

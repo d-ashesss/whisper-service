@@ -22,12 +22,13 @@ func newFuncOption(f func(*options)) *funcOption {
 	return &funcOption{f: f}
 }
 
-func (f *funcOption) apply(o *options) {
-	f.f(o)
+func (fdo *funcOption) apply(do *options) {
+	fdo.f(do)
 }
 
-func WithFormat(format string) Option {
+// WithFormat specifies desired format of the transcription.
+func WithFormat(f string) Option {
 	return newFuncOption(func(o *options) {
-		o.Format = format
+		o.Format = f
 	})
 }

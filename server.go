@@ -22,7 +22,7 @@ func NewServer(srv whisper.Service) *WhisperServiceServer {
 
 func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_TranscribeServer) error {
 	log.Printf("[whisper.transcribe] Received transcription request")
-	_, file, err := recvTranscribe(stream)
+	req, file, err := recvTranscribe(stream)
 	if err != nil {
 		log.Printf("[whisper.transcribe] ERROR: Failed to receive or save the file: %s", err)
 		if _, ok := status.FromError(err); ok {
@@ -36,7 +36,12 @@ func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_Transcr
 		}
 	}(file.Name())
 
-	transcript, err := s.service.Transcribe(stream.Context(), file.Name())
+	opts := make([]whisper.Option, 0)
+	if req.Format != "" {
+		opts = append(opts, whisper.WithFormat(req.Format))
+	}
+
+	transcript, err := s.service.Transcribe(stream.Context(), file.Name(), opts...)
 	if err != nil {
 		log.Printf("[whisper.transcribe] ERROR: Transcription failed: %s", err)
 		return status.Errorf(codes.Internal, "transcription failed")

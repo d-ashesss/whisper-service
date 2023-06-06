@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 
+	whisper "github.com/d-ashesss/whisper-service/whisper"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,23 +14,30 @@ type Service struct {
 	mock.Mock
 }
 
-// Transcribe provides a mock function with given fields: ctx, filepath
-func (_m *Service) Transcribe(ctx context.Context, filepath string) (string, error) {
-	ret := _m.Called(ctx, filepath)
+// Transcribe provides a mock function with given fields: ctx, audiopath, opts
+func (_m *Service) Transcribe(ctx context.Context, audiopath string, opts ...whisper.Option) (string, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, audiopath)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
-		return rf(ctx, filepath)
+	if rf, ok := ret.Get(0).(func(context.Context, string, ...whisper.Option) (string, error)); ok {
+		return rf(ctx, audiopath, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
-		r0 = rf(ctx, filepath)
+	if rf, ok := ret.Get(0).(func(context.Context, string, ...whisper.Option) string); ok {
+		r0 = rf(ctx, audiopath, opts...)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, filepath)
+	if rf, ok := ret.Get(1).(func(context.Context, string, ...whisper.Option) error); ok {
+		r1 = rf(ctx, audiopath, opts...)
 	} else {
 		r1 = ret.Error(1)
 	}

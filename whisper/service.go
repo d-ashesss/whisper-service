@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -30,7 +29,7 @@ func (err TranscriptionError) Unwrap() error {
 }
 
 type Service interface {
-	Transcribe(ctx context.Context, audiopath string) (string, error)
+	Transcribe(ctx context.Context, audiopath string, opts ...Option) (string, error)
 }
 
 func NewService() Service {
@@ -40,9 +39,13 @@ func NewService() Service {
 type localService struct {
 }
 
-func (s localService) Transcribe(ctx context.Context, audiopath string) (string, error) {
+func (s localService) Transcribe(ctx context.Context, audiopath string, opts ...Option) (string, error) {
+	runopts := defaultOptions()
+	for _, o := range opts {
+		o.apply(&runopts)
+	}
 	args := []string{
-		"--output_format", "json",
+		"--output_format", runopts.Format,
 		"--output_dir", os.TempDir(),
 		"--verbose", "False",
 		audiopath,
@@ -56,9 +59,7 @@ func (s localService) Transcribe(ctx context.Context, audiopath string) (string,
 		return "", err
 	}
 	filename := strings.TrimSuffix(path.Base(audiopath), path.Ext(audiopath))
-	transcriptpath := os.TempDir() + "/" + filename + ".json"
-	log.Println(audiopath)
-	log.Println(transcriptpath)
+	transcriptpath := path.Join(os.TempDir(), filename+"."+runopts.Format)
 	transcript, err := os.ReadFile(transcriptpath)
 	if err != nil {
 		return "", fmt.Errorf("read transcription file: %w", err)

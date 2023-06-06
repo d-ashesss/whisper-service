@@ -26,6 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WhisperServiceClient interface {
+	// Transcribe performes transcription of audio file into text.
 	Transcribe(ctx context.Context, opts ...grpc.CallOption) (WhisperService_TranscribeClient, error)
 }
 
@@ -75,6 +76,7 @@ func (x *whisperServiceTranscribeClient) CloseAndRecv() (*TranscribeResponse, er
 // All implementations must embed UnimplementedWhisperServiceServer
 // for forward compatibility
 type WhisperServiceServer interface {
+	// Transcribe performes transcription of audio file into text.
 	Transcribe(WhisperService_TranscribeServer) error
 	mustEmbedUnimplementedWhisperServiceServer()
 }

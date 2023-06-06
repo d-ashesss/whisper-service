@@ -3,14 +3,18 @@ package proto;
 option go_package = "github.com/d-ashesss/whisper-service/proto/whisperpb";
 
 message TranscribeRequest {
+  // Chunk is a part of audio file.
   bytes chunk = 1;
+  // Format is a format of the transcription.
   string format = 2;
 }
 
 message TranscribeResponse {
+  // Transcription is transcription text.
   string transcription = 1;
 }
 
 service WhisperService {
+  // Transcribe performes transcription of audio file into text.
   rpc Transcribe(stream TranscribeRequest) returns(TranscribeResponse);
 }

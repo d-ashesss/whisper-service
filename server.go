@@ -11,15 +11,18 @@ import (
 	"os"
 )
 
+// WhisperServiceServer is an implementation of Whisper gRPC server.
 type WhisperServiceServer struct {
 	whisperpb.UnimplementedWhisperServiceServer
 	service whisper.Service
 }
 
+// NewServer creates a gRPC Service for Whisper.
 func NewServer(srv whisper.Service) *WhisperServiceServer {
 	return &WhisperServiceServer{service: srv}
 }
 
+// Transcribe performes transcription of audio file into text.
 func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_TranscribeServer) error {
 	log.Printf("[whisper.transcribe] Received transcription request")
 	req, file, err := recvTranscribe(stream)
@@ -55,6 +58,8 @@ func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_Transcr
 	return nil
 }
 
+// recvTranscribe receives audio contents from request stream and saves it into temporary file.
+// Caller must delete the file after it has been processed.
 func recvTranscribe(stream whisperpb.WhisperService_TranscribeServer) (*whisperpb.TranscribeRequest, *os.File, error) {
 	file, err := os.CreateTemp("", "*.tmp")
 	if err != nil {

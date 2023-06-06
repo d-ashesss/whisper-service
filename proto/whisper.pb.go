@@ -25,7 +25,9 @@ type TranscribeRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Chunk  []byte `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	// Chunk is a part of audio file.
+	Chunk []byte `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	// Format is a format of the transcription.
 	Format string `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
 }
 
@@ -80,6 +82,7 @@ type TranscribeResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Transcription is transcription text.
 	Transcription string `protobuf:"bytes,1,opt,name=transcription,proto3" json:"transcription,omitempty"`
 }
 

@@ -1,6 +1,7 @@
 package whisper
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -15,7 +16,13 @@ type TranscriptionError struct {
 }
 
 func (err TranscriptionError) Error() string {
-	return fmt.Sprintf("whisper: %s\n%s", err.ee, err.ee.Stderr)
+	stderr := bytes.TrimSpace(err.ee.Stderr)
+	if err.ee.ProcessState.ExitCode() == 2 || bytes.HasPrefix(stderr, []byte("Traceback")) {
+		if idx := bytes.LastIndexByte(stderr, '\n'); idx > 0 {
+			stderr = stderr[idx+1:]
+		}
+	}
+	return fmt.Sprintf("whisper: %s\n%s", err.ee, stderr)
 }
 
 func (err TranscriptionError) Unwrap() error {

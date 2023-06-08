@@ -2,7 +2,18 @@ package whisper
 
 // options contains Whisper service configuraiton options.
 type options struct {
+	// Format is a format of the transcription.
 	Format string
+	// InitialPrompt is optional text to provide as a prompt for the first window.
+	InitialPrompt string
+	// Language specifies language spoken in the audio, otherwise it will be detected automatically.
+	Language string
+	// MaxLineCount defines maximum lines in a single captions segment.
+	MaxLineCount uint32
+	// MaxLineWidth defines maximum length of the line.
+	MaxLineWidth uint32
+	// Translate translates transcription to English.
+	Translate bool
 }
 
 // defaultOptions creates options set with default values.

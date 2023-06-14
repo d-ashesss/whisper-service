@@ -12,9 +12,9 @@ message TranscribeRequest {
   // Language specifies language spoken in the audio, otherwise it will be detected automatically.
   string language = 4;
   // MaxLineCount defines maximum lines in a single captions segment.
-  uint32 max_line_count = 5;
+  uint64 max_line_count = 5;
   // MaxLineWidth defines maximum length of the line.
-  uint32 max_line_width = 6;
+  uint64 max_line_width = 6;
   // Translate translates transcription to English.
   bool translate = 7;
 }

@@ -9,9 +9,9 @@ type options struct {
 	// Language specifies language spoken in the audio, otherwise it will be detected automatically.
 	Language string
 	// MaxLineCount defines maximum lines in a single captions segment.
-	MaxLineCount uint32
+	MaxLineCount uint64
 	// MaxLineWidth defines maximum length of the line.
-	MaxLineWidth uint32
+	MaxLineWidth uint64
 	// Translate translates transcription to English.
 	Translate bool
 }
@@ -43,9 +43,44 @@ func (fdo *funcOption) apply(do *options) {
 	fdo.f(do)
 }
 
-// WithFormat specifies desired format of the transcription.
-func WithFormat(f string) Option {
+// WithFormat sets desired format of the transcription.
+func WithFormat(v string) Option {
 	return newFuncOption(func(o *options) {
-		o.Format = f
+		o.Format = v
+	})
+}
+
+// WithInitialPrompt sets optional text to provide as a prompt for the first window.
+func WithInitialPrompt(v string) Option {
+	return newFuncOption(func(o *options) {
+		o.InitialPrompt = v
+	})
+}
+
+// WithLanguage sets specifies language spoken in the audio.
+func WithLanguage(v string) Option {
+	return newFuncOption(func(o *options) {
+		o.Language = v
+	})
+}
+
+// WithMaxLineCount sets maximum lines in a single captions segment.
+func WithMaxLineCount(v uint64) Option {
+	return newFuncOption(func(o *options) {
+		o.MaxLineCount = v
+	})
+}
+
+// WithWithMaxLineWidth sets maximum length of the line.
+func WithWithMaxLineWidth(v uint64) Option {
+	return newFuncOption(func(o *options) {
+		o.MaxLineWidth = v
+	})
+}
+
+// WithTranslation sets whether the transcriptions should be translated to English.
+func WithTranslation() Option {
+	return newFuncOption(func(o *options) {
+		o.Translate = true
 	})
 }

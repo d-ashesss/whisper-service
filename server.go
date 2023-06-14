@@ -43,6 +43,21 @@ func (s WhisperServiceServer) Transcribe(stream whisperpb.WhisperService_Transcr
 	if req.Format != "" {
 		opts = append(opts, whisper.WithFormat(req.Format))
 	}
+	if req.InitialPrompt != "" {
+		opts = append(opts, whisper.WithInitialPrompt(req.InitialPrompt))
+	}
+	if req.Language != "" {
+		opts = append(opts, whisper.WithLanguage(req.Language))
+	}
+	if req.MaxLineCount > 0 {
+		opts = append(opts, whisper.WithMaxLineCount(req.MaxLineCount))
+	}
+	if req.MaxLineWidth > 0 {
+		opts = append(opts, whisper.WithWithMaxLineWidth(req.MaxLineWidth))
+	}
+	if req.Translate {
+		opts = append(opts, whisper.WithTranslation())
+	}
 
 	transcript, err := s.service.Transcribe(stream.Context(), file.Name(), opts...)
 	if err != nil {

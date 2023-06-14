@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +17,21 @@ func runWhisper(ctx context.Context, audiopath string, opts options) (string, er
 		"--output_dir", os.TempDir(),
 		"--verbose", "False",
 		"--word_timestamps", "True",
+	}
+	if opts.InitialPrompt != "" {
+		args = append(args, "--initial_prompt", opts.InitialPrompt)
+	}
+	if opts.Language != "" {
+		args = append(args, "--language", opts.Language)
+	}
+	if opts.MaxLineCount > 0 {
+		args = append(args, "--max_line_count", strconv.FormatUint(opts.MaxLineCount, 10))
+	}
+	if opts.MaxLineWidth > 0 {
+		args = append(args, "--max_line_width", strconv.FormatUint(opts.MaxLineWidth, 10))
+	}
+	if opts.Translate {
+		args = append(args, "--task", "translate")
 	}
 	cmd := exec.CommandContext(ctx, "whisper", args...)
 

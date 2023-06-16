@@ -84,7 +84,7 @@ func TestWhisperServiceServer_Transcribe(t *testing.T) {
 		require.Equalf(t, codes.Internal, stat.Code(), "expecting status %s, got: %s", codes.Internal, stat)
 	})
 
-	t.Run("successfull request", func(t *testing.T) {
+	t.Run("successful request", func(t *testing.T) {
 		service := mocks.NewService(t)
 		service.On("Transcribe", mock.Anything, mock.Anything).Return("transcribed test", nil)
 		client, closer := server(t, service)

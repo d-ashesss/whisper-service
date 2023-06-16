@@ -1,6 +1,6 @@
 package whisper
 
-// options contains Whisper service configuraiton options.
+// options contains Whisper service configuration options.
 type options struct {
 	// Format is a format of the transcription.
 	Format string
